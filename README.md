@@ -2,10 +2,13 @@
 
 ## Real-Time, Local-First Adaptive Emotion Intelligence
 
-[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.15+-FF6F00?logo=tensorflow&logoColor=white)](https://tensorflow.org)
-[![Flutter](https://img.shields.io/badge/Flutter-v3.0+-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
-[![React](https://img.shields.io/badge/React-v18+-61DAFB?logo=react&logoColor=black)](https://reactjs.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<p align="center">
+  <img src="https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white" />
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+  <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" />
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
+  <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" />
+</p>
 
 ---
 
@@ -13,70 +16,69 @@
 
 ---
 
-## 🚀 Technical Core: The Intelligence Stream
+## �️ The Full-Spectrum Tech Stack
 
-Developing a robust emotion engine requires a balance between raw accuracy and hardware constraints. Our approach focuses on two critical pillars:
+Our stack is engineered for high-performance inference and cross-platform flexibility.
 
-### 1. The "from-scratch" CNN Architecture 🧠
+### 🧠 Intelligence (The Brain)
+*   **Language:** `Python 3.12+`
+*   **Deep Learning:** `TensorFlow 2.15+`, `Keras`
+*   **Deployment Formats:** `LiteRT (TFLite)`, `TensorFlow.js (JSON)`
+*   **Computer Vision:** `OpenCV`, `MediaPipe Face Mesh`
+*   **Data Analysis:** `Pandas`, `NumPy`, `Matplotlib`
+*   **Preprocessing:** `Scikit-learn`
+*   **Optimization:** `8-bit Post-Training Quantization`
 
-Unlike generic pre-trained models, Spectra's brain is a custom-engineered **Convolutional Neural Network** trained on the **FER-2013** dataset.
+### 💻 Platform: Web (The Shell)
+*   **Framework:** `React.js v18`
+*   **Runtime:** `Node.js`
+*   **Inference Engine:** `@tensorflow/tfjs`, `@tensorflow/tfjs-tflite`
+*   **Vision Pipe:** `@mediapipe/face_detection`
+*   **Styling:** `Vanilla CSS` (Glassmorphism), `Framer Motion` (Animations)
+*   **Storage:** `IndexedDB` (for local weight deltas)
+*   **Hosting:** `Vercel`
 
-* **Custom Layers:** A 4-layer CNN designed specifically to extract micro-expressions (eye contours, lip curvature).
-* **Data Augmentation:** To ensure the AI works in real-world lighting, we use a rigorous augmentation pipeline:
-  * `±15°` Rotation & `10%` Zoom for variable camera angles.
-  * `±20%` Brightness/Contrast shifts for low-light environments.
-  * Horizontal flipping to maintain emotional symmetry.
-* **On-Device Personalization:** Using **LiteRT Training Signatures**, our model allows users to correct predictions locally, running a single training epoch on the final layers to adapt to *their* unique face.
+### 📱 Platform: Mobile (The Body)
+*   **Framework:** `Flutter v3.0+`
+*   **Language:** `Dart`
+*   **Inference Engine:** `tflite_flutter` / `google_mlkit_face_detection`
+*   **Image Processing:** `Camera API`, `ImageLib`
+*   **Smoothing Algorithm:** `EWMA (Exponentially Weighted Moving Average)`
 
-### 2. Extreme Client-Side Efficiency ⚡
+---
 
-To achieve sub-100ms inference on browsers and mobile devices, we implemented aggressive optimization:
+## 🚀 Technical Core
 
-* **8-bit Quantization:** Reducing weights from 32-bit floats to 8-bit integers, shrinking the model size to **<15MB** without sacrificing precision.
-* **Pruning:** Eliminating redundant neural connections to lower the Flops required for each frame.
-* **Dual-runtime support:** Seamlessly exporting to `.tflite` for native mobile performance and `.json` for WebGL-accelerated browser inference.
+### 1. Custom CNN Architecture
+We don't use high-latency, generic APIs. Spectra features a custom 4-layer CNN trained from scratch on the **FER-2013** dataset, optimized for micro-expression detection.
+
+### 2. Client-Side Efficiency
+*   **Quantization:** 32-bit to 8-bit weight conversion for **<15MB** model footprints.
+*   **Privacy:** 100% On-device processing. No raw frames ever touch a network socket.
+*   **On-Device Personalization:** Local SGD (Stochastic Gradient Descent) for user-specific weight updates.
 
 ---
 
 ## 📂 Project Architecture
 
-The repository is structured to separate the **Intelligence (The Brain)** from the **Platform (The Body)**.
-
 ```text
 ProjectSpectra/
-├── 🧠 intelligence/         # Soroush's Domain: Model Research & Training
+├── � intelligence/         # Soroush's Domain: Model Research & Training
 │   ├── data/               # FER-2013 Datasets (Raw/Cleaned)
 │   ├── models/             # Final Exports (.tflite, .json, .bin)
 │   ├── notebooks/          # Training Experiments & Data Cleaning
 │   └── src/                # Preprocessing & Export Logic
-├── 📱 platforms/            # Shervin's Domain: Cross-Platform Shells
+├── 🌐 platforms/            # Shervin's Domain: Cross-Platform Shells
 │   ├── web/                # React Shell (TensorFlow.js)
 │   └── mobile/             # Flutter Shell (LiteRT/TFLite)
-├── 🎨 shared/               # Universal design assets & branding
-├── 📄 master_plan.md        # The project blueprint (Revision 5.0)
-└── ⚙️ .gitignore            # Security for biometric data
+├── 📦 shared/               # Universal design assets & branding
+├── � master_plan.md        # The project blueprint (Revision 5.0)
+└── 🛡️ .gitignore            # Security for biometric data
 ```
 
 ---
 
-## 🛠️ The Local-First Workflow
-
-1. **Detection:** MediaPipe identifies the face ROI.
-2. **Normalization:** The image is converted to $48 \times 48$ Grayscale.
-3. **Inference:** The local model outputs 7 emotional probabilities.
-4. **Smoothing:** An **Exponentially Weighted Moving Average (EWMA)** filters "twitchy" results for a fluid UI.
-5. **Persistence:** Local weight deltas are saved to `IndexDB` or mobile storage for a truly personalized experience.
-
----
-
-## 🤝 Collaborative Sync
-
-We operate on a **Stream-Based Branching** model to ensure simultaneous development:
-
-* `stream/intelligence`: Model architecture, training, and 8-bit quantization.
-* `stream/interface`: UI/UX, Camera integration, and Smoothing logic.
-
----
-
-**Built with ❤️ by Soroush & Shervin**  
-*"Spectra: See the emotion, keep the privacy."*
+<p align="center">
+  <b>Built with ❤️ by Soroush & Shervin</b><br>
+  <i>"Spectra: See the emotion, keep the privacy."</i>
+</p>
