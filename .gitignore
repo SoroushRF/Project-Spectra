@@ -9,9 +9,11 @@ venv/
 ENV/
 intelligence/data/*
 !intelligence/data/.gitkeep
-intelligence/models/*.h5
-intelligence/models/*.tflite
-intelligence/models/*.keras
+# Allow committing models (Small enough for standard Git)
+# intelligence/models/*.h5
+# intelligence/models/*.tflite
+# intelligence/models/*.keras
+*_log.txt
 
 
 # Web / React
