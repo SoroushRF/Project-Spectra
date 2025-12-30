@@ -75,6 +75,11 @@ The model expects `48x48` pixels.
 *   The model eats Grayscale (1 channel).
 *   **Rule:** You MUST convert RGB -> Gray -> Normalize (0-1) before inference.
 
+### 💀 4. DO NOT Process "Pitch Black" Frames
+*   **Discovery:** In low light (Black Screen), the model tends to default to "Angry" (or 0-index).
+*   **Fix:** Check average pixel brightness before inference.
+*   **Rule:** If `avg_brightness < 20` (out of 255), display "Too Dark" and skip inference.
+
 ---
 
 ## 5. YOUR MISSION (Phase 4 Tasks)
