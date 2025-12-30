@@ -1,7 +1,8 @@
 # 📕 THE SPECTRA BIBLE: ARCHITECTURAL SPECIFICATIONS & ENCYCLOPEDIA
 
 **Project:** Spectra (Local-First Adaptive Emotion Intelligence)
-**Architects:** Soroush (Intelligence) & Shervin (Platform)
+**Architects:** Lead AI Engineer & Lead Platform Engineer
+
 **Revision:** 5.0 (Absolute Detail)
 
 ---
@@ -18,18 +19,22 @@ By running inference in the browser (React/TFJS) or natively (Flutter/TFLite), w
 
 * **Web:** Limited by WebGL/WebGPU overhead.
 * **Native:** Limited by CPU/GPU thermal throttling on mobile (Android).
-* **Solution:** Soroush must prioritize "Model Pruning" and Shervin must prioritize "Frame Skipping" (running inference every 3rd frame while the UI renders at 60fps).
+* **Solution:** The AI Stream must prioritize "Model Pruning" and the Platform Stream must prioritize "Frame Skipping" (running inference every 3rd frame while the UI renders at 60fps).
+
 
 ---
 
-## 2. THE SOROUSH PROTOCOL: INTELLIGENCE DESIGN (THE BRAIN)
+## 2. THE AI STREAM PROTOCOL: INTELLIGENCE DESIGN (THE BRAIN)
 
-Soroush is responsible for the **Latent Space** of the model. If the model cannot distinguish between a "smirk" and a "scowl," the project fails.
+
+The AI Engineer is responsible for the **Latent Space** of the model. If the model cannot distinguish between a "smirk" and a "scowl," the project fails.
+
 
 ### 2.1 Dataset Engineering (FER-2013+)
 
-* **Standardization:** Soroush must clean the FER-2013 dataset. It contains "noise" (cartoons or poorly cropped faces).
-* **Augmentation Strategy:** To make the model robust, Soroush will apply:
+* **Standardization:** The AI team must clean the FER-2013 dataset. It contains "noise" (cartoons or poorly cropped faces).
+* **Augmentation Strategy:** To make the model robust, the AI team will apply:
+
   * **Rotation:** ±15 degrees.
   * **Zoom:** 10% (simulating users sitting closer/further).
   * **Brightness/Contrast:** ±20% (simulating bad lighting).
@@ -46,20 +51,24 @@ The model is a **Convolutional Neural Network**.
 
 ### 2.3 On-Device Training (The Holy Grail)
 
-Soroush must export the model with **LiteRT Training Signatures**.
+The AI team must export the model with **LiteRT Training Signatures**.
+
 
 * **Unlocked Layers:** Only the final `Dense` layer and `Softmax` layer are trainable.
 * **Optimizer:** SGD (Stochastic Gradient Descent) is used on-device for simplicity and speed.
 
 ---
 
-## 3. THE SHERVIN PROTOCOL: PLATFORM DESIGN (THE BODY)
+## 3. THE PLATFORM STREAM PROTOCOL: PLATFORM DESIGN (THE BODY)
 
-Shervin is responsible for the **Inference Pipeline**. If the camera feed is laggy, the AI feels broken.
+
+The Platform Engineer is responsible for the **Inference Pipeline**. If the camera feed is laggy, the AI feels broken.
+
 
 ### 3.1 The "Eye" (MediaPipe Integration)
 
-Shervin must implement a high-speed detection loop.
+The Platform team must implement a high-speed detection loop.
+
 
 * **Web:** Use the `@mediapipe/face_detection` package.
 * **Native:** Use `google_mlkit_face_detection`.
@@ -76,7 +85,8 @@ $$\text{Filtered\_Score}_t = \alpha \cdot \text{Raw\_Score}_t + (1 - \alpha) \cd
 
 ### 3.3 The Local Filing Cabinet (Storage)
 
-Shervin must manage the **Weight Deltas**.
+The Platform team must manage the **Weight Deltas**.
+
 
 * **Format:** A `.bin` or `.json` file containing only the weights for the final layer.
 * **Logic:** On startup, load the base model, then "inject" the saved user weights.
@@ -85,7 +95,8 @@ Shervin must manage the **Weight Deltas**.
 
 ## 4. THE INTEGRATION CONTRACT (THE HANDSHAKE)
 
-Soroush and Shervin must agree on this **Tensor Format** or the model will output gibberish.
+The AI and Platform teams must agree on this **Tensor Format** or the model will output gibberish.
+
 
 | Property | Value | Why? |
 | :--- | :--- | :--- |

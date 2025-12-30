@@ -2,8 +2,9 @@
 **Handoff Version:** 1.0  
 **Status:** READY FOR PIPELINE TEST
 
-To: **Shervin (Platform)**  
-From: **Soroush (Intelligence)**
+To: **Lead Platform Engineer**  
+From: **Lead AI Engineer**
+
 
 ### 1. Asset Locations
 *   **Flutter (Mobile):** `platforms/mobile/assets/spectra_dummy_model.tflite`
@@ -19,8 +20,18 @@ To avoid "Inference Error" or garbage results, ensure your image processing pipe
 | **Normalization** | Pixel values must be divided by `255.0` (Scale: 0.0 to 1.0) |
 | **Labels (Indices)** | `0:Angry, 1:Disgust, 2:Fear, 3:Happy, 4:Sad, 5:Surprise, 6:Neutral` |
 
-### 3. Verification Test
-If your pipeline is correct, passing a **pure white** image ($48 \times 48$ pixels of $1.0$) should return a stable probability array. If the app crashes or returns an array of size other than 7, check the tensor resizing logic.
+### 3. Consistency Verification (The Golden Target)
+To ensure your preprocessing matches the training environment, I have provided a **Spectra Golden Target**.
+
+*   **Target Image:** `shared/test_assets/golden_face_target.png`
+*   **Reference Tensor:** `shared/test_assets/golden_tensor.npy`
+
+**Your Task:**
+Run the Golden Target image through your app's preprocessing logic. The resulting 48x48 float32 array MUST match the values in the reference tensor exactly. Even a 5% difference will cause accuracy drift.
+
+### 4. Verification Test
+If your pipeline is correct, passing the **Golden Target** through your code should return values identical to the reference tensor.
+
 
 ---
 *Next: Moving to Phase 2 (Real Training) once you confirm the webcam -> model bridge is green.*

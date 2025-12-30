@@ -11,7 +11,8 @@ os.makedirs(OUT_DIR, exist_ok=True)
 model_json = {
     "format": "layers-model",
     "generatedBy": "Spectra Manual Generator",
-    "convertedBy": "Soroush",
+    "convertedBy": "Lead AI Engineer",
+
     "modelTopology": {
         "class_name": "Sequential",
         "config": {

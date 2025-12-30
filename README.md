@@ -64,12 +64,14 @@ We don't use high-latency, generic APIs. Spectra features a custom 4-layer CNN t
 
 ```text
 ProjectSpectra/
-├── � intelligence/         # Soroush's Domain: Model Research & Training
+├── � intelligence/         # AI Stream Domain: Model Research & Training
+
 │   ├── data/               # FER-2013 Datasets (Raw/Cleaned)
 │   ├── models/             # Final Exports (.tflite, .json, .bin)
 │   ├── notebooks/          # Training Experiments & Data Cleaning
 │   └── src/                # Preprocessing & Export Logic
-├── 🌐 platforms/            # Shervin's Domain: Cross-Platform Shells
+├── 🌐 platforms/            # Platform Stream Domain: Cross-Platform Shells
+
 │   ├── web/                # React Shell (TensorFlow.js)
 │   └── mobile/             # Flutter Shell (LiteRT/TFLite)
 ├── 📦 shared/               # Universal design assets & branding
@@ -80,6 +82,7 @@ ProjectSpectra/
 ---
 
 <p align="center">
-  <b>Built with ❤️ by Soroush & Shervin</b><br>
+  <b>Built with ❤️ by the Project Spectra Team</b><br>
   <i>"Spectra: See the emotion, keep the privacy."</i>
 </p>
+
