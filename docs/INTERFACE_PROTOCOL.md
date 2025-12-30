@@ -48,7 +48,7 @@ We have generated strict documentation for you. **Read them in this order:**
     *   *Use it for:* Getting the exact Model Paths, Input Shapes, and Label Maps.
     *   *CRITICAL:* Requires normalization (`pixel / 255.0`). Failure to normalize = Garbage output.
 
-2.  **`intelligence/docs/adaptation_logic.md`**  
+2.  **`docs/adaptation_logic.md`**  
     *   *What it is:* The algorithm for "Personalization".
     *   *Use it for:* Implementing the "Sensitivity Calibration" feature.
     *   *Constraint:* Do **NOT** attempt backpropagation on the device. CPU usage must remain low. Use the "Ghost Weights" logic defined here.

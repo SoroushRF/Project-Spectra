@@ -12,6 +12,14 @@
 
 ---
 
+## 📑 Table of Contents
+1.  [The Full-Spectrum Tech Stack](#️-the-full-spectrum-tech-stack)
+2.  [Technical Core](#-technical-core)
+3.  [Project Architecture](#-project-architecture)
+4.  [Verification & Testing (QA)](#-verification--testing-quality-assurance)
+
+---
+
 **Spectra** is a cutting-edge, cross-platform mood detection ecosystem built on the principle of **Client-Side Edge AI**. We prioritize user privacy by processing all biometric data locally, ensuring that high-resolution facial streams never leave the device.
 
 ---
@@ -81,8 +89,35 @@ ProjectSpectra/
 
 ---
 
+---
+
+## 🛡️ Verification & Testing (Quality Assurance)
+
+We do not ship guesswork. Every model version passes the **Spectra Deployment Verification Suite (DVS)** before release.
+
+| Metric | Status | Count |
+| :--- | :--- | :--- |
+| **Pass Rate** | 🟢 **100%** | 17/17 Tests |
+| **Coverage** | 🔵 **Full** | Logic + Math + Files |
+| **Drift (PC vs Mobile)** | 🟢 **< 1%** | Quantization Verified |
+
+### 🧪 The Test Suite
+Our verification engine (`test_suite.py`) enforces strict contracts on:
+1.  **Bit-Exactness:** Keras vs TFLite consistency.
+2.  **Probability Laws:** Outputs must sum to 1.0 (Softmax).
+3.  **App Logic:** Darkness filters and Sensitivity algorithms.
+
+👉 **[Read the Full Technical Report](docs/TEST_SUITE_REPORT.md)**
+
+```bash
+# Run the verification suite
+python intelligence/src/test_suite.py
+```
+
+---
+
 <p align="center">
-  <b>Built with ❤️ by the Project Spectra Team</b><br>
+  <b>Built with ❤️ by the Project Spectra Team</b>
   <i>"Spectra: See the emotion, keep the privacy."</i>
 </p>
 
