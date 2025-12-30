@@ -21,8 +21,9 @@
 Our stack is engineered for high-performance inference and cross-platform flexibility.
 
 ### 🧠 Intelligence (The Brain)
-*   **Language:** `Python 3.12+`
+*   **Language:** `Python 3.12`
 *   **Deep Learning:** `TensorFlow 2.15+`, `Keras`
+
 *   **Deployment Formats:** `LiteRT (TFLite)`, `TensorFlow.js (JSON)`
 *   **Computer Vision:** `OpenCV`, `MediaPipe Face Mesh`
 *   **Data Analysis:** `Pandas`, `NumPy`, `Matplotlib`

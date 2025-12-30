@@ -176,7 +176,7 @@ ProjectSpectra/
 │   ├── models/             # EXPORTS (.tflite, .json, .h5, .bin)
 │   ├── notebooks/          # Training Experiments (Jupyter)
 │   ├── src/                # Preprocessing & Export Scripts
-│   └── requirements.txt    # Python Dependencies
+│   └── requirements.txt    # Python 3.12 Dependencies
 ├── platforms/              # THE BODY (Shervin's domain)
 │   ├── web/                # React Shell (TensorFlow.js)
 │   │   ├── public/         # Static assets + Symlink to models/
