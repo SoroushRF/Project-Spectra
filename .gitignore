@@ -11,6 +11,8 @@ intelligence/data/*
 !intelligence/data/.gitkeep
 intelligence/models/*.h5
 intelligence/models/*.tflite
+intelligence/models/*.keras
+
 
 # Web / React
 node_modules/

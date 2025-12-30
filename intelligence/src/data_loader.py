@@ -1,68 +1,70 @@
-import tensorflow as tf
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
+import cv2
+import numpy as np
+import tensorflow as tf
 
 # SPECTRA PROTOCOL CONSTANTS
 IMG_SIZE = 48
-BATCH_SIZE = 64
+BATCH_SIZE = 128
 TRAIN_DIR = os.path.join("intelligence", "data", "archive", "train")
 TEST_DIR = os.path.join("intelligence", "data", "archive", "test")
 
+EMOTIONS = ['angry', 'disgust', 'fear', 'happy', 'neutral', 'sad', 'surprise']
+LABEL_MAP = {emotion: i for i, emotion in enumerate(EMOTIONS)}
+
+def load_data_from_disk(directory):
+    """
+    Manually loads images into RAM to bypass Windows Disk I/O bottlenecks.
+    """
+    images = []
+    labels = []
+    
+    print(f"📂 Loading data from: {directory}")
+    for emotion in EMOTIONS:
+        emotion_path = os.path.join(directory, emotion)
+        if not os.path.exists(emotion_path):
+            continue
+            
+        label = LABEL_MAP[emotion]
+        files = [f for f in os.listdir(emotion_path) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+        
+        print(f"  - Reading '{emotion}' ({len(files)} files)...")
+        for f in files:
+            img_path = os.path.join(emotion_path, f)
+            # Read as Grayscale
+            img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+            if img is not None:
+                img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
+                images.append(img)
+                labels.append(label)
+                
+    # Convert to NumPy and Normalize
+    X = np.array(images, dtype='float32').reshape(-1, IMG_SIZE, IMG_SIZE, 1) / 255.0
+    y = tf.keras.utils.to_categorical(np.array(labels), num_classes=len(EMOTIONS))
+    
+    return X, y
+
 def get_data_generators():
     """
-    Creates the training and validation data generators with the AI Stream Augmentation Protocol.
+    Spectra 'Total Recall' Mode: Loads entire dataset into RAM.
     """
-    print("🚚 Initializing AI Stream Data Pipeline...")
+    print("🧠 Initializing Spectra 'Total Recall' (RAM Binding) Pipeline...")
 
-    # 1. Training Augmentation Protocol (Revision 5.0)
-    train_datagen = ImageDataGenerator(
-        rescale=1./255,          # Normalization protocol
-        rotation_range=15,       # ±15 degrees
-        zoom_range=0.1,          # 10% zoom
-        horizontal_flip=True,    # Symmetry check
-        brightness_range=[0.8, 1.2], # ±20% lighting
-        validation_split=0.2     # Use 20% of train for dev validation
+    # Load everything into memory
+    X_train_full, y_train_full = load_data_from_disk(TRAIN_DIR)
+    X_test, y_test = load_data_from_disk(TEST_DIR)
+
+    # Manual Validation Split
+    from sklearn.model_selection import train_test_split
+    X_train, X_val, y_train, y_val = train_test_split(
+        X_train_full, y_train_full, test_size=0.2, random_state=42, stratify=y_train_full
     )
 
-    # 2. Testing Protocol (Only Rescale, no Augmentation)
-    test_datagen = ImageDataGenerator(rescale=1./255)
-
-    # 3. Create the Training Generator
-    train_generator = train_datagen.flow_from_directory(
-        TRAIN_DIR,
-        target_size=(IMG_SIZE, IMG_SIZE),
-        batch_size=BATCH_SIZE,
-        color_mode="grayscale",
-        class_mode="categorical",
-        subset="training",
-        shuffle=True
-    )
-
-    # 4. Create the Validation Generator (Internal)
-    val_generator = train_datagen.flow_from_directory(
-        TRAIN_DIR,
-        target_size=(IMG_SIZE, IMG_SIZE),
-        batch_size=BATCH_SIZE,
-        color_mode="grayscale",
-        class_mode="categorical",
-        subset="validation",
-        shuffle=True
-    )
-
-    # 5. Create the Test Generator (Final Eval)
-    test_generator = test_datagen.flow_from_directory(
-        TEST_DIR,
-        target_size=(IMG_SIZE, IMG_SIZE),
-        batch_size=BATCH_SIZE,
-        color_mode="grayscale",
-        class_mode="categorical",
-        shuffle=False
-    )
-
-    print(f"✅ Pipeline Configured: {train_generator.num_classes} Emotion Categories Identified.")
-    return train_generator, val_generator, test_generator
+    print(f"✅ RAM Loading Complete.")
+    print(f"📍 Train: {len(X_train)} | Val: {len(X_val)} | Test: {len(X_test)}")
+    
+    return (X_train, y_train), (X_val, y_val), (X_test, y_test)
 
 if __name__ == "__main__":
-    # Test run
     train, val, test = get_data_generators()
-    print(f"🕵️  Test Batch Shape: {train[0][0].shape}") 
+    print(f"🕵️  Memory Usage Check (X_train): {train[0].nbytes / 1e6:.2f} MB")
