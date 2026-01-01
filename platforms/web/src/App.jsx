@@ -63,14 +63,14 @@ function App() {
         const ctx = overlayRef.current.getContext('2d');
         const video = videoRef.current;
 
-        // 1. Safety Loop: Ensure video has dimensions before drawing
+        // Task 2.1: Robust Canvas Synchronization
         if (video.videoWidth === 0 || video.videoHeight === 0) return;
 
-        // 2. Resolution Sync: Set canvas to match source video exactly (e.g., 1280x720)
-        // This ensures 1:1 coordinate mapping with the detection results
+        // Sync Resolution
         if (overlayRef.current.width !== video.videoWidth || overlayRef.current.height !== video.videoHeight) {
             overlayRef.current.width = video.videoWidth;
             overlayRef.current.height = video.videoHeight;
+            console.log(`Spectra: Canvas synced to video resolution: ${video.videoWidth}x${video.videoHeight}`);
         }
 
         ctx.clearRect(0, 0, overlayRef.current.width, overlayRef.current.height);

@@ -24,6 +24,7 @@ export default function EmotionDetector({ videoRef, onResults }) {
         async function init() {
             try {
                 await tf.ready();
+                await tf.setBackend('cpu'); // FALLBACK: CPU to bypass GPU Glitches
 
                 // Load Emotion Model
                 const loadedModel = await tf.loadLayersModel('/models/model.json');
@@ -31,7 +32,7 @@ export default function EmotionDetector({ videoRef, onResults }) {
                 // Initialize Face Detector
                 const detectorModel = faceDetection.SupportedModels.MediaPipeFaceDetector;
                 const detectorConfig = {
-                    runtime: 'tfjs', // Use tfjs runtime within the app
+                    runtime: 'tfjs', // Reverting to tfjs to fix WASM crash
                     maxFaces: 1,
                     modelType: 'short'
                 };
@@ -63,10 +64,14 @@ export default function EmotionDetector({ videoRef, onResults }) {
 
         try {
             // 1. Detect Face First
-            const faces = await detector.estimateFaces(videoRef.current, { flipHorizontal: false });
+            // Convert to tensor first to ensure valid data is passed to detector
+            const inputTensor = tf.browser.fromPixels(videoRef.current);
+            const faces = await detector.estimateFaces(inputTensor, { flipHorizontal: false });
+            inputTensor.dispose(); // Important: Free GPU memory immediately
 
             if (Math.random() < 0.01) {
                 console.log('Detector: Pulse Check - Faces found:', faces?.length);
+                if (faces?.[0]) console.log('Detector: RAW FACE DATA:', faces[0]);
             }
 
             let faceBox = null;
@@ -79,6 +84,23 @@ export default function EmotionDetector({ videoRef, onResults }) {
                     return;
                 }
                 faceBox = face.box;
+
+                // CRITICAL FIX: Handle Normalized Coordinates
+                // If the detector returns 0-1 values, we MUST scale them to pixels
+                // otherwise the crop will be 0x0 (Grey Square) -> Model sees nothing -> Defaults to Neutral
+                if (faceBox.xMin < 2 && faceBox.width < 2) {
+                    const vid = videoRef.current;
+                    faceBox = {
+                        xMin: faceBox.xMin * vid.videoWidth,
+                        yMin: faceBox.yMin * vid.videoHeight,
+                        width: faceBox.width * vid.videoWidth,
+                        height: faceBox.height * vid.videoHeight,
+                        // Optional: xMax/yMax if used elsewhere
+                        xMax: (faceBox.xMin + faceBox.width) * vid.videoWidth,
+                        yMax: (faceBox.yMin + faceBox.height) * vid.videoHeight
+                    };
+                    // console.log("Spectra: Coordinates Denormalized", faceBox);
+                }
 
                 results = tf.tidy(() => {
                     // 2. Capture pixels
@@ -94,7 +116,10 @@ export default function EmotionDetector({ videoRef, onResults }) {
                     const cropHeight = Math.max(1, Math.min(img.shape[0] - startY, Math.floor(height)));
 
                     const cropped = img.slice([startY, startX, 0], [cropHeight, cropWidth, 3]);
-                    const gray = cropped.mean(2).expandDims(-1);
+                    // Luma Grayscale (Match Python cv2.COLOR_BGR2GRAY)
+                    const rgb = cropped.toFloat();
+                    const [r, g, b] = tf.split(rgb, 3, 2);
+                    const gray = r.mul(0.299).add(g.mul(0.587)).add(b.mul(0.114));
                     const resized = gray.resizeBilinear([48, 48]);
 
                     // 4. Debug visualization
@@ -110,6 +135,14 @@ export default function EmotionDetector({ videoRef, onResults }) {
                     if (!prediction) {
                         console.error('Detector: Model prediction returned undefined');
                         return null;
+                    }
+
+                    // Task 1.2: Verify Tensor Shape & Range
+                    if (Math.random() < 0.01) {
+                         const shape = normalized.shape;
+                         const minVal = normalized.min().dataSync()[0];
+                         const maxVal = normalized.max().dataSync()[0];
+                         console.log(`Detector Check: Shape=${shape}, Range=[${minVal.toFixed(2)}, ${maxVal.toFixed(2)}]`);
                     }
 
                     const scores = prediction.dataSync();
