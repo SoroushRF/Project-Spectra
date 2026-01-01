@@ -24,7 +24,7 @@ export default function EmotionDetector({ videoRef, onResults }) {
         async function init() {
             try {
                 await tf.ready();
-                await tf.setBackend('cpu'); // FALLBACK: CPU to bypass GPU Glitches
+                await tf.setBackend('webgl'); // Restore GPU for performance (Input Tensor fix should allow this now)
 
                 // Load Emotion Model
                 const loadedModel = await tf.loadLayersModel('/models/model.json');
