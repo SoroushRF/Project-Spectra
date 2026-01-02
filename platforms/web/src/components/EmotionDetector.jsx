@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as tf from '@tensorflow/tfjs';
 import * as faceDetection from '@tensorflow-models/face-detection';
+import { usePerformanceMonitor } from '../hooks/usePerformanceMonitor';
 
 const EMOTIONS = [
     'Angry',    // 0
@@ -18,7 +19,9 @@ export default function EmotionDetector({ videoRef, onResults }) {
     const [loading, setLoading] = useState(true);
     const [isTooDark, setIsTooDark] = useState(false);
     const requestRef = useRef();
+    const loopGeneration = useRef(0); // Security Badge for loops
     const debugCanvasRef = useRef();
+    const { metrics, metricsRef, updateMetrics } = usePerformanceMonitor();
 
     useEffect(() => {
         async function init() {
@@ -56,26 +59,32 @@ export default function EmotionDetector({ videoRef, onResults }) {
         init();
     }, []);
 
-    const predict = async () => {
+    const predict = async (genId) => {
+        // KILL ORDER: If this isn't the active generation, DIE.
+        if (genId !== loopGeneration.current) return;
+
         if (!model || !detector || !videoRef.current || videoRef.current.readyState < 2) {
-            requestRef.current = requestAnimationFrame(predict);
+            requestRef.current = requestAnimationFrame(() => predict(genId));
             return;
         }
 
         try {
+            const startTime = performance.now();
+            
             // 1. Detect Face First
-            // Convert to tensor first to ensure valid data is passed to detector
+            const detectStart = performance.now();
             const inputTensor = tf.browser.fromPixels(videoRef.current);
             const faces = await detector.estimateFaces(inputTensor, { flipHorizontal: false });
-            inputTensor.dispose(); // Important: Free GPU memory immediately
+            inputTensor.dispose();
+            const detectEnd = performance.now();
+
+            let faceBox = null;
+            let results = null;
 
             if (Math.random() < 0.01) {
                 console.log('Detector: Pulse Check - Faces found:', faces?.length);
                 if (faces?.[0]) console.log('Detector: RAW FACE DATA:', faces[0]);
             }
-
-            let faceBox = null;
-            let results = null;
 
             if (faces && faces.length > 0) {
                 const face = faces[0];
@@ -130,6 +139,8 @@ export default function EmotionDetector({ videoRef, onResults }) {
 
                     // 5. Prediction
                     const normalized = resized.toFloat().div(tf.scalar(255.0)).expandDims(0);
+                    
+
                     const prediction = model.predict(normalized);
 
                     if (!prediction) {
@@ -153,6 +164,25 @@ export default function EmotionDetector({ videoRef, onResults }) {
                 });
             }
 
+            const endTime = performance.now();
+
+            // Update performance engine
+            updateMetrics({
+                detection: detectEnd - detectStart,
+                inference: results ? (endTime - detectEnd) : 0,
+                total: endTime - startTime
+            });
+
+            // Pulse check log (Now using Ref for non-zero data)
+            if (Math.random() < 0.05) {
+                const live = metricsRef.current;
+                console.log(
+                    `%c[Spectra Lab]%c FPS: ${live.fps} | Detect: ${live.detectionLatency}ms | Infer: ${live.inferenceLatency}ms | VRAM: ${live.gpuMemory}MB`,
+                    "color: #00f2ff; font-weight: bold;",
+                    "color: inherit;"
+                );
+            }
+
             if (results) {
                 if (isTooDark) setIsTooDark(false);
                 onResults({ emotions: results, faceBox });
@@ -166,15 +196,21 @@ export default function EmotionDetector({ videoRef, onResults }) {
             onResults({ emotions: [], faceBox: null });
         }
 
-        requestRef.current = requestAnimationFrame(predict);
+        // Sequential Loop: Pass the Generation Badge forward
+        requestRef.current = requestAnimationFrame(() => predict(genId));
     };
 
     useEffect(() => {
-        if (model) {
-            requestRef.current = requestAnimationFrame(predict);
+        if (detector && model) {
+            // New Generation: Kills any ghost loops still waiting on the GPU
+            loopGeneration.current += 1;
+            predict(loopGeneration.current);
         }
-        return () => cancelAnimationFrame(requestRef.current);
-    }, [model]);
+        return () => {
+            if (requestRef.current) cancelAnimationFrame(requestRef.current);
+            loopGeneration.current += 1; // Mark current gen as dead
+        };
+    }, [detector, model]);
 
     return (
         <div className="detector-bundle" style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
@@ -196,6 +232,36 @@ export default function EmotionDetector({ videoRef, onResults }) {
                     {loading ? 'CALIBRATING...' : (isTooDark ? 'LOW_LIGHT' : 'STREAM_LIVE')}
                 </span>
             </div>
+
+            {/* NEW STEADY HUD: Performance metrics stay fixed here */}
+            {!loading && (
+                <div className="perf-hud" style={{
+                    position: 'fixed',
+                    bottom: '20px',
+                    left: '20px',
+                    padding: '10px 15px',
+                    background: 'rgba(0,0,0,0.8)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(0, 242, 255, 0.3)',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    gap: '20px',
+                    zIndex: 9999,
+                    fontFamily: 'monospace',
+                    fontSize: '0.7rem'
+                }}>
+                    <div style={{ color: 'var(--neon-cyan)' }}>FPS: <span style={{ color: '#fff' }}>{metrics.fps}</span></div>
+                    <div style={{ color: 'var(--neon-cyan)' }}>DET: <span style={{ color: '#fff' }}>{metrics.detectionLatency}ms</span></div>
+                    <div style={{ color: 'var(--neon-cyan)' }}>INF: <span style={{ color: '#fff' }}>{metrics.inferenceLatency}ms</span></div>
+                    <div style={{ 
+                        color: metrics.isMemoryLeaking ? '#ff4444' : 'var(--neon-cyan)',
+                        transition: 'color 0.3s ease'
+                    }}>
+                        MEM: <span style={{ color: '#fff' }}>{metrics.gpuMemory}MB</span>
+                        {metrics.isMemoryLeaking && <span title="Potential Memory Leak Detected!" style={{ marginLeft: '5px' }}>⚠️</span>}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

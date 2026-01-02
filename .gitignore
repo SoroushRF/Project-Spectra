@@ -43,5 +43,8 @@ platforms/mobile/build/
 Thumbs.db
 *.weights
 *.log
+# IDE / Tooling
 .vscode/
 .idea/
+.vite/
+**/.vite/

@@ -133,7 +133,7 @@ export default function DocumentationView() {
                         <div className="instruction-step">
                             <h4 style={{ color: 'var(--neon-cyan)', marginBottom: '0.5rem', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px' }}>03. Interpretation</h4>
                             <p style={{ opacity: 0.7, fontSize: '0.9rem', lineHeight: '1.5' }}>
-                                The "Dominant State" represents the highest confidence score from the inference engine. Fluctuations are normal; look for sustained trends > 2 seconds.
+                                The "Dominant State" represents the highest confidence score from the inference engine. Fluctuations are normal; look for sustained trends &gt; 2 seconds.
                             </p>
                         </div>
                     </div>
