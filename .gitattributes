@@ -1,0 +1,20 @@
+# .gitattributes
+
+package-lock.json linguist-generated
+platforms/web/package-lock.json linguist-generated
+
+*.bin linguist-generated
+*.model linguist-generated
+*.keras linguist-generated
+*.tflite linguist-generated
+*.npy linguist-generated
+
+platforms/web/public/models/*.json linguist-generated
+
+
+*.svg linguist-vendored
+*.png linguist-vendored
+
+dist/** linguist-generated
+build/** linguist-generated
+node_modules/** linguist-generated
