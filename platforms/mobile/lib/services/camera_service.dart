@@ -78,12 +78,23 @@ class CameraService {
       final bytes = allBytes.done().buffer.asUint8List();
 
       final Size imageSize = Size(image.width.toDouble(), image.height.toDouble());
-      InputImageRotation rotation = InputImageRotation.rotation90deg;
       
+      // Determine rotation based on platform and camera orientation
+      InputImageRotation rotation = InputImageRotation.rotation90deg;
+      if (Platform.isAndroid) {
+        rotation = InputImageRotation.rotation270deg; // Common for front camera on Android
+      }
+      
+      // Determine format
+      InputImageFormat format = InputImageFormat.bgra8888;
+      if (Platform.isAndroid) {
+        format = InputImageFormat.yuv420;
+      }
+
       final metadata = InputImageMetadata(
         size: imageSize,
         rotation: rotation,
-        format: InputImageFormat.bgra8888,
+        format: format,
         bytesPerRow: image.planes[0].bytesPerRow,
       );
 
